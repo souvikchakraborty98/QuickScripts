@@ -2,35 +2,37 @@ import re
 import requests
 from bs4 import BeautifulSoup
 from msvcrt import getch, kbhit
+from colorama import init,Fore, Back, Style
+init(autoreset=True)
 import os
 import wget
 aborted=False
 link_reference_scihub = 'https://sci-hub.tw/10.1016/j.wocn.2018.07.001'
 link_reference="https://doi.org/10.1016/j.lwt.2020.109217"
 
-os.system('color')
 
-HEADER = '\033[95m'
-OKBLUE = '\033[94m'
-OKGREEN = '\033[92m'
-WARNING = '\033[93m'
-FAIL = '\033[91m'
-ENDC = '\033[0m'
-BOLD = '\033[1m'
-UNDERLINE = '\033[4m'
+
+# HEADER = '\033[95m'
+# OKBLUE = '\033[94m'
+# OKGREEN = '\033[92m'
+# WARNING = '\033[93m'
+# FAIL = '\033[91m'
+# ENDC = '\033[0m'
+# BOLD = '\033[1m'
+# UNDERLINE = '\033[4m'
 
 def clear(): 
     if os.name == 'nt': 
         _ = os.system('cls') 
-  
-    # for mac and linux(here, os.name is 'posix') 
     else: 
         _ = os.system('clear') 
 
 while aborted!=True:
-    print(HEADER+"## SciHub Paper Downloader ## ver: 0.0.5a \n## Copyright,Souvik Chakraborty."+UNDERLINE+"The author in no way promotes \"SciHub\" or related parties.\nThis is just a scraping tool.##\n"+ENDC)
-    print(HEADER+"Enter the DOI of the desired paper. Refer formats below:"+ENDC)
-    link=input("Link Reference: "+link_reference+"\n"+"No. Reference: 10.3389/fimmu.2020.00693\n\n"+OKBLUE+"Enter DOI url [CASE SENSITIVE]  O|R  DOI no. [CASE SENSITIVE] \n\n"+ENDC)
+    print(Fore.MAGENTA+"## SciHub Paper Downloader ## ver: 0.0.5a \n## Copyright,Souvik Chakraborty.The author in no way promotes \"SciHub\" or related parties.\nThis is just a scraping tool.##\n")
+    print(Fore.MAGENTA+"Enter the DOI of the desired paper. Refer formats below:")
+    print("Link Reference: "+link_reference+"\n"+"No. Reference: 10.3389/fimmu.2020.00693\n")
+    print(Fore.YELLOW+"Enter DOI url [CASE SENSITIVE]  O|R  DOI no. [CASE SENSITIVE] \n\n")
+    link=input()
 
     if link[0:4]=="http":
         link="https://sci-hub.tw/"+link
@@ -56,7 +58,7 @@ while aborted!=True:
             for url in urls:
              pdflist.append(url)
     except Exception as e:
-        print(f"{FAIL}No links found: {e}{ENDC}")
+        print(f"{Fore.RED}No links found: {e}")
         getch()
         exit()
 
@@ -64,7 +66,7 @@ while aborted!=True:
 
     for url in pdflist:
             if (".pdf" or "download=true" or "sci-hub") in str(url):
-                print(OKGREEN+"https:"+url[0:-1]+ENDC)
+                print(Fore.GREEN+"https:"+url[0:-1])
 
     pdfDown="https:"+pdflist[0][0:-1]
 
@@ -82,11 +84,11 @@ while aborted!=True:
         #     if ch:
         #         Pypdf.write(ch)
 
-    print(OKGREEN+"\n\nSaved to "+os.path.abspath(fname)+"\n"+ENDC)
+    print(Fore.GREEN+"\n\nSaved to "+os.path.abspath(fname)+"\n")
 
     op=True
     while op!=False:
-        print(BOLD+"\nPress 'Enter' to open. Press 'esc' to close.\n\nPress any other key to continue downloading...\n"+ENDC)
+        print(Fore.GREEN+"\nPress 'Enter' to open. Press 'esc' to close.\n\nPress any other key to continue downloading...\n")
         keypress=getch()
         if keypress == chr(27).encode():
             aborted=True
@@ -94,9 +96,9 @@ while aborted!=True:
             exit()
         elif keypress == chr(13).encode():
             os.startfile(fname)
-            print(OKBLUE+"Paused...Press any key to continue\n"+ENDC)
+            print(Fore.BLUE+"Paused...Press any key to continue\n")
             getch()
-            print(BOLD+"\n==================================================\n"+ENDC)
+            print(Style.BRIGHT+"\n==================================================\n")
             op=True
         else:
             op=False
