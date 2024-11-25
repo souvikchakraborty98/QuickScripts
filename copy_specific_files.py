@@ -1,6 +1,7 @@
 import os
 import shutil
 from datetime import datetime
+from pathlib import Path
 
 def get_extension():
     """Prompt the user for the file extension."""
@@ -9,31 +10,29 @@ def get_extension():
         extension = f".{extension}"
     return extension
 
+def get_folder(prompt, default):
+    while True:
+        folder = input(prompt).strip() or default
+        path = Path(folder)
+        if path.exists():
+            return path.resolve()
+        else:
+            print(f"The specified {default} '{folder}' does not exist. Please try again.")
+
 def get_source_folder():
     """Prompt the user for the source folder."""
-    source_folder = input("Enter the source folder path (leave blank to use the current directory): ").strip()
-    if not source_folder:
-        source_folder = os.getcwd()
-    if not os.path.exists(source_folder):
-        print(f"Source folder '{source_folder}' does not exist!")
-        exit(1)
-    return source_folder
+    return get_folder("Enter the source folder path (leave blank to use the current directory): ", "current directory")
 
 def get_destination_folder():
     """Prompt the user for the destination folder."""
-    destination_folder = input("Enter the destination folder path (leave blank to create a new folder in the current directory): ").strip()
-    if not destination_folder:
-        timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
-        destination_folder = os.path.join(os.getcwd(), f"CopiedFiles_{timestamp}")
-        os.makedirs(destination_folder, exist_ok=True)
-    elif not os.path.exists(destination_folder):
-        os.makedirs(destination_folder)
-    return destination_folder
+    timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+    default_name = f"CopiedFiles_{timestamp}"
+    return get_folder(f"Enter the destination folder path (leave blank to create a new folder '{default_name}' in the current directory): ", default_name)
 
 def check_write_permission(folder):
     """Check if the folder is writable."""
+    test_file = folder / "PermissionTest.tmp"
     try:
-        test_file = os.path.join(folder, "PermissionTest.tmp")
         with open(test_file, "w") as f:
             f.write("test")
         os.remove(test_file)
@@ -49,8 +48,8 @@ def copy_files_with_extension(extension, source_folder, destination_folder):
     for root, _, files in os.walk(source_folder):
         for file in files:
             if file.lower().endswith(extension.lower()):
-                source_file = os.path.join(root, file)
-                destination_file = os.path.join(destination_folder, file)
+                source_file = Path(root) / file
+                destination_file = destination_folder / file
                 try:
                     shutil.copy2(source_file, destination_file)
                     print(f"Copied: {source_file} to {destination_file}")
